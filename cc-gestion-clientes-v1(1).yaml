@@ -1,0 +1,491 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: API de Teléfonos.
+  description: |
+    API para poder guardar el resultado de las encuestas realizadas a los clientes en campañas telefónicas de bienvenidas.
+
+host: www.gestioncobranzabaz.com.mx
+
+basePath: /GestionesCC/v1
+
+schemes:
+  - https
+
+produces:
+  - application/json
+
+securityDefinitions:
+  basicAuth:
+    description: >
+      Para acceder a la API se debe pasar un Username y Password válido en todas las transacciones de cada producto.
+      La siguiente sintaxis se debe utilizar en el encabezado 'Authorization' :
+        Basic : 2zzLJmBAtTNIU8nF8e8XbmDvaNGs
+    type: apiKey
+    name: Authorization
+    in: header
+
+security:
+  - basicAuth: []
+
+paths:
+  /consulta-campania:
+    post:
+      description: A través de este recurso se consultara las campañas asignadas al despacho para la gestión del día.
+      tags:
+        - Gestión Call Center
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          required: true
+          name: idDespacho
+          type: number
+          description: Identificador asignado al despacho
+        - in: header
+          required: true
+          name: x-api-key
+          type: string
+          description: apiKey asignado al despacho 
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/ResponseCampania"
+        404:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error404"
+        400:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error400"
+        500:
+          description: Error interno en el servidor.
+          schema:
+            $ref: "#/definitions/error"
+
+  /consulta-clientes:
+    post:
+      description: A través de este recurso se consultara los clientes asignados por campaña.
+      tags:
+        - Gestión Call Center
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          required: true
+          name: idDespacho
+          type: number
+          description: Identificador asignado al despacho
+        - in: query
+          required: true
+          name: idCampana
+          type: number
+          description: identificador de la campaña.
+        - in: header
+          required: true
+          name: x-api-key
+          type: string
+          description: apiKey asignado al despacho 
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/ResponseCliente"
+        400:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error400"
+        404:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error404"
+        500:
+          description: Error interno en el servidor.
+          schema:
+            $ref: "#/definitions/error"       
+
+definitions:
+  RequestGestionesTelefono :
+    type: object
+    required: [canalCorte, clienteUnico, feVisGes, idAccion, idCamp, idGestion, numCorte, numEmp, observa, sucCorte, telefono]
+    properties:
+      canalCorte:
+        type: number
+        description: Identificador del despacho.
+        enum:
+          - 1
+          - 2
+          - 3
+          - 7
+          - 8 fico
+      clienteUnico:
+        type: object
+        properties:
+          idPais:
+            type: number
+            description: Identificador del país.
+            example: 1
+          idCanal:
+            type: number
+            description: Identificador del canal.
+            example: 1
+          idSucursal:
+            type: number
+            description: Identificador de la sucursal.
+            example: 4987
+          folio:
+            type: number
+            description: Identificador del folio del cliente.
+            example: 43566
+      feVisGes:
+        type: string
+        description: Fecha de inserción dd/mm/aaaa.
+        example: 31/08/2021
+      idAccion:
+        type: number
+        description: Identificador de acción gestión, revisar el catálogo de gestiones  de gestiones activas .
+        example: 3
+      idCamp:
+        type: number
+        description: Identificador de campaña.
+        example: 234
+      idGestion:
+        type: number
+        description: Identificador de gestión, revisar el catálogo de gestiones  de gestiones activas .
+        example: 233
+      numCorte:
+        type: number
+        description: Valor predeterminado para contac center 0.
+        example: 0
+      numEmp:
+        type: string
+        description: Identificador del empleado.
+      observa: 
+        type: string
+        description: Observaciones o comentarios sobre la gestión.
+        example: Prueba
+      sucCorte:
+        type: number
+        description: Valor predeterminado para despachos de contac center 0.
+        example: 0
+      telefono:
+        type: string
+        description: Teléfono del cliente a 10 dígitos.
+        example: 5588203052
+
+  ResponseCampania:
+    type: object
+    properties:
+      codigo:
+        type: string
+        example: "200.CobranzaCredito-Call-Center.155200"
+      mensaje:
+        type: string
+        description: Mensaje de éxito.
+        example: "Operación exitosa."
+      folio:
+        type: string
+        description: Folio de la operación.
+        example: "155-202000021116513300"
+      resultado:
+        type: object
+        properties:
+          campanias:
+            type: array
+            items: 
+              type: object
+              properties: 
+                id: 
+                  type: number
+                  description: Identificador de la campaña.
+                  example: 72 
+                tipoCampania:
+                  type: number
+                  description: Identificador del tipo de campaña. 2 Cobranza, 1 Welcome.
+                  example: 2
+            
+  error404:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error.
+        example: "404.CobranzaCredito-Call-Center.155404"
+      mensaje:
+        type: string
+        description: Descripción del error.
+        example: "Recurso no encontrado."
+      folio:
+        type: string
+        description: Número de folio de la operación.
+        example: "155-202010021116433700"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error.
+        example: "https://baz-developer.bancoazteca.com.mx/info#400.CobranzaCredito-Investigacion-Cobranza-Call-Center.155404"
+      detalles:
+        type: array
+        items:
+          type: string
+          description: Detalles del Error.
+          example: "No se encuentran datos asociados a la consulta."
+  error400:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error.
+        example: "400.CobranzaCredito-Call-Center.155400"
+      mensaje:
+        type: string
+        description: Descripción del error.
+        example: "Datos de entrada incorrectos, favor de validar."
+      folio:
+        type: string
+        description: Número de folio de la operación.
+        example: "155-202010021116433700"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error.
+        example: "https://baz-developer.bancoazteca.com.mx/info#400.CobranzaCredito-Investigacion-Cobranza-Call-Center.155400"
+      detalles:
+        type: array
+        items:
+          type: string
+          description: Detalles del Error.
+          example: "No se encuentran datos asociados a la consulta."
+
+  error:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error.
+        example: "500.CobranzaCredito-Call-Center.155500"
+      mensaje:
+        type: string
+        description: Descripción del error.
+        example: "No se recibió respuesta del servidor."
+      folio:
+        type: string
+        description: Número de folio de la operación.
+        example: "155-202010021116433700"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error.
+        example: "https://baz-developer.bancoazteca.com.mx/info#400.CobranzaCredito-Investigacion-Cobranza-Call-Center-Encuesta.155500"
+      detalles:
+        type: array
+        items:
+          type: string
+          description: Detalles del Error.
+          example: ""
+
+  ResponseGestionesTelefono:
+    type: object
+    properties:
+      codigo:
+        type: string
+        example: "201.CobranzaCredito-Call-Center.155201"
+      mensaje:
+        type: string
+        description: Mensaje de éxito.
+        example: "Operación exitosa."
+      folio:
+        type: string
+        description: Folio de la operación.
+        example: "155-202110181604535600"
+      info:
+        type: object
+        description: Descripción de la información.
+        example: "201.CobranzaCredito-Call-Center.155201"
+
+  ResponseCliente:
+    type: object
+    properties:
+      codigo:
+        type: string
+        example: "201.CobranzaCredito-Call-Center-Gestion.155201"
+      mensaje:
+        type: string
+        description: Mensaje de éxito.
+        example: "Operación exitosa."
+      folio:
+        type: string
+        description: Folio de la operación.
+        example: "155-202110181604535600"
+      info:
+        type: object
+        description: Descripción de la información.
+        example: "201.CobranzaCredito-Call-Center.155201"
+      resultado:
+        type: object
+        properties:
+          clientes:
+            type: array
+            description: Array con todos los clientes asignados a la campaña.
+            items:
+              type: object
+              properties: 
+                idCampania:
+                  type: number
+                  description: identificador de la fila de trabajo
+                  example: 1260
+                idPais:
+                  type: number
+                  description: Identificador del país.
+                  example: 1
+                idCanal:
+                  type: number
+                  description: Identificador del canal.
+                  example: 1
+                idSucursal:
+                  type: number
+                  description: Identificador de la sucursal.
+                  example: 2138
+                folio:
+                  type: number
+                  description: Identificador del folio del cliente.
+                  example: 98862
+                semanasAtraso:
+                  type: number
+                  description: Semanas de atraso del cliente 
+                  example: 2
+                saldo:
+                  type: number
+                  description: Saldo actual del crédito
+                  example: 9789
+                saldoCapital: 
+                  type: number 
+                  description: Saldo capital del crédito
+                  example: 1000
+                pagoRequerido:
+                  type: number
+                  description: Pago para que el cliente se ponga al corriente.
+                  example: 226
+                nombre:
+                  type: string
+                  description: Nombre del cliente
+                  example: LAURA
+                apellidoPaterno:
+                  type: string
+                  description: Apellido paterno del cliente
+                  example: VAZQUEZ
+                apellidoMaterno:
+                  type: string
+                  description: Apellido materno del cliente
+                  example: VAZQUEZ
+                telefono1:
+                  type: number
+                  description: número telefónico principal del cliente
+                  example: 5531124258
+                tipoTelefono1:
+                  type: string
+                  description: número telefónico principal del cliente
+                  example: MOVIL
+                telefono2:
+                  type: number
+                  description: número telefónico principal del cliente
+                  example: 5531124258
+                tipoTelefono2:
+                  type: string
+                  description: número telefónico  del cliente
+                  example: MOVIL
+                telefono3:
+                  type: number
+                  description: número telefónico  del cliente
+                  example: 5531124258
+                tipoTelefono3:
+                  type: string
+                  description: número telefónico  del cliente
+                  example: FIJO
+                diaPago:
+                  type: number
+                  description: Día de pago del cliente, Domingo = 1, Lunes = 2, Martes= 3, Miércoles = 4, Jueves = 5, Viernes= 6, Sábado= 7 
+                  example: 3
+                diasAtraso:
+                  type: number
+                  description: días de atraso que tiene el cliente.
+                  example: 1
+                pagoMinimo:
+                  type: number
+                  description: Pago para que el cliente no se atrase, solo aplica para clientes con tarjeta de crédito.
+                  example: 0
+                pagoNoGeneraIntereses:
+                  type: number
+                  description: Pago para que nos se generen intereses, solo aplica para clientes con tarjeta de crédito.
+                pagoDisponible:
+                  type: number
+                  description: Monto disponible de la capacidad de pago del cliente.
+                  example: 668
+                abonoPuntual:
+                  type: number
+                  description: Monto del abono si el cliente lo realiza puntualmente
+                  example: 226
+                abonoSemanal:
+                  type: number
+                  description: Monto del abono semanal.
+                capacidadPago:
+                  type: number
+                  description: Monto disponible del cliente para pagar créditos acorde a sus ingresos.
+                  example: 668
+                creditoActivo:
+                  type: number
+                  description: Identificador para conocer si la línea de crédito sigue activa, 0= desactivada, 1= activa.
+                  example: 1
+                fechaProximaPago:
+                  type: string
+                  description: Fecha del próximo pago del cliente.
+                  example: "2022-06-30"
+                fechaVencimiento:
+                  type: string
+                  description: Fecha de fin de pago.
+                  example: "2022-06-30"
+                creditoAutorizado:
+                  type: string
+                  description: Monto autorizado de la línea de crédito
+                  example:
+                tasaInteres: 
+                  type: string
+                  description: Tasa de interés que tiene el cliente 
+                  example: 0
+                calle:
+                  type: string
+                  description: domicilio del cliente
+                numeroInterior:
+                  type: string
+                  description: domicilio del cliente
+                numeroExterior:
+                  type: string
+                  description: domicilio del cliente
+                colonia:
+                  type: string
+                  description: domicilio del cliente
+                codigoPostal:
+                  type: string
+                  description: domicilio del cliente
+          
+
+
+  summary:
+    type: object
+    properties:
+      api-name:
+        type: string
+        description: API para poder guardar el resultado de las encuestas realizadas a los clientes en campañas telefónicas  de bienvenidas.
+        example: Encuesta  V1
+      encuesta-bienvenida-post:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: Se encarga de guardar el resultado de la encuesta realizada a un cliente en una llamada de bienvenida.
+            example: Se encarga de guardar el resultado de la encuesta realizada a un cliente en una llamada de bienvenida.
+
+
