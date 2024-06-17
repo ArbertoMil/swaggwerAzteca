@@ -1,13 +1,13 @@
 swagger: "2.0"
 info:
-  version: "2.0.0"
+  version: "1.0.0"
   title: API de Gestiones.
   description: |
-    API para la consulta de clientes.
+    API para la consulta de clientes en gestion de cobranza por call center.
 
 host: www.gestioncobranzabaz.com.mx
 
-basePath: /GestionesCC/v2
+basePath: /GestionesCC
 
 schemes:
   - https
@@ -20,7 +20,7 @@ securityDefinitions:
     description: >
       Para acceder a la API se debe pasar un Username y Password válido en todas las transacciones de cada producto.
       La siguiente sintaxis se debe utilizar en el encabezado 'Authorization' :
-        Basic : 2zzLJmBAtTNIU8nF8e8XbmDvaNGs
+        Basic : xxxxxxxxxx
     type: apiKey
     name: Authorization
     in: header
@@ -29,8 +29,45 @@ security:
   - basicAuth: []
 
 paths:
-  
-  /consulta-clientes:
+  /v1/consulta-campania:
+    post:
+      description: A través de este recurso se consultara las campañas asignadas al despacho para la gestión del día.
+      tags:
+        - Gestión Call Center
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          required: true
+          name: idDespacho
+          type: number
+          description: Identificador asignado al despacho
+        - in: header
+          required: true
+          name: x-api-key
+          type: string
+          description: apiKey asignado al despacho 
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/ResponseCampania"
+        404:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error404"
+        400:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error400"
+        500:
+          description: Error interno en el servidor.
+          schema:
+            $ref: "#/definitions/error"
+
+  /v2/consulta-clientes:
     post:
       description: A través de este recurso se consultara los clientes asignados por campaña.
       tags:
@@ -72,21 +109,43 @@ paths:
           description: Error interno en el servidor.
           schema:
             $ref: "#/definitions/error"       
+  
+  /v1/inserta-gestion:
+    post:
+      description: A través de este recurso se registran las tipificaciones por cliente.
+      tags:
+        - Gestión Call Center
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Parámetros de entrada.
+          required: true
+          description: Identificador asignado al despacho
+          schema:
+            $ref: "#/definitions/RequestGestionesTelefono"
+       
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/ResponseGestionesTelefono"
+        400:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error400"
+        500:
+          description: Error interno en el servidor.
+          schema:
+            $ref: "#/definitions/error"       
 
 definitions:
   RequestGestionesTelefono :
     type: object
-    required: [canalCorte, clienteUnico, feVisGes, idAccion, idCamp, idGestion, numCorte, numEmp, observa, sucCorte, telefono]
+    required: [canalCorte, clienteUnico, idAccion, idCampania, idGestion, despacho, numeroEmpleado, comentario, telefono]
     properties:
-      canalCorte:
-        type: number
-        description: Identificador del despacho.
-        enum:
-          - 1
-          - 2
-          - 3
-          - 7
-          - 8 fico
       clienteUnico:
         type: object
         properties:
@@ -106,41 +165,49 @@ definitions:
             type: number
             description: Identificador del folio del cliente.
             example: 43566
-      feVisGes:
-        type: string
-        description: Fecha de inserción dd/mm/aaaa.
-        example: 31/08/2021
-      idAccion:
-        type: number
-        description: Identificador de acción gestión, revisar el catálogo de gestiones  de gestiones activas .
-        example: 3
-      idCamp:
-        type: number
-        description: Identificador de campaña.
-        example: 234
       idGestion:
         type: number
         description: Identificador de gestión, revisar el catálogo de gestiones  de gestiones activas .
         example: 233
-      numCorte:
+      idAccion:
         type: number
-        description: Valor predeterminado para contac center 0.
-        example: 0
-      numEmp:
-        type: string
-        description: Identificador del empleado.
-      observa: 
+        description: Identificador de acción gestión, revisar el catálogo de gestiones  de gestiones activas .
+        example: 3
+      comentario: 
         type: string
         description: Observaciones o comentarios sobre la gestión.
         example: Prueba
-      sucCorte:
+      numeroEmpleado:
+        type: string
+        description: Identificador del empleado, debe ser número y máximo de 10 dígitos.
+      idCampania:
         type: number
-        description: Valor predeterminado para despachos de contac center 0.
-        example: 0
+        description: Identificador de campaña.
+        example: 234
       telefono:
         type: string
         description: Teléfono del cliente a 10 dígitos.
         example: 5588203052
+      despacho:
+        type: number
+        description: Identificador del despacho.
+        example: 1
+      idOrigen:
+        type: number
+        description: identificador del tipo de gestion, 1- inbound, 2- outbound.
+        example: 1
+      montoPromesa:
+        type: number
+        description: Monto de la promesa, este campo solo es obligatorio si el idGestion es de promesa de pago.
+        example: 10
+      fechaPromesa:
+        type: string
+        description: Fecha de la promesa, formato de la fecha dd/mm/aaaa, este campo solo es obligatorio si el idGestion es de promesa de pago.
+        example: 31/08/2021
+      horaPromesa:
+        type: string
+        description: Hora de la promesa, formato de la hora HH:mm:ss, este campo solo es obligatorio si el idGestion es de promesa de pago.
+        example: 13:46:00
 
   ResponseCampania:
     type: object
@@ -222,7 +289,7 @@ definitions:
         items:
           type: string
           description: Detalles del Error.
-          example: "No se encuentran datos asociados a la consulta."
+          example: "Parámetros incorrectos."
 
   error:
     type: object
@@ -435,6 +502,10 @@ definitions:
                 codigoPostal:
                   type: string
                   description: domicilio del cliente
+                producto:
+                  type: string
+                  description: Producto del cliente por el cual salió a campaña.
+                  example: COMERCIO.
           
 
 
