@@ -1,0 +1,881 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Api campaña para cobranza call center
+
+  description: |
+    API para obtener las campañas de cobranza para centros de contactos.
+
+host: dev-api.bancoazteca.com.mx:8080
+
+basePath: /socios-comerciales/investigacion-cobranza/pagos-credito/campanias/v1
+
+schemes:
+  - https
+
+produces:
+  - application/json
+
+securityDefinitions:
+  Bearer:
+    description: >
+      Para acceder a la API se debe pasar un token válido en todas las consultas.
+      La siguiente sintaxis se debe utilizar en el encabezado 'Authorization' :
+        Bearer: 2zzLJmBAtTNIU8nF8e8XbmDvaNGs
+    type: apiKey
+    name: Authorization
+    in: header
+
+security:
+  - Bearer: []
+
+paths:
+  /campanias:
+    get:
+      description: Obtiene las campañas de Contact Center dependiendo del tipo en un rango de fecha.
+      tags:
+        - Campañas Contac Center.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: x-id-acceso
+          in: header
+          description: |
+            `Identificador de acceso (idAcceso) obtenido del api de seguridad.`
+          required: true
+          type: string
+          default: Q685828920200407191603
+        - in: query
+          required: false
+          name: fechaInicial
+          type: string
+          default: 01-01-1991
+          description: Requerido cuando se consultan campañas activas. El campo es obligatorio si idEstatus es igual a 1.
+        - in: query
+          required: false
+          name: fechaFinal
+          type: string
+          default: 01-01-1991
+          description: Requerido cuando se consultan campañas activas. El campo es obligatorio si idEstatus es igual a 1.
+        - in: query
+          required: false
+          name: idCanalEnvio
+          type: string
+          default: 5
+          description: El idCanalEnvio consulta campañas de llamadas, sms, email, etc. El campo es obligatorio si IdEstatus es igual a 0.
+        - in: query
+          required: false
+          name: idEstatus
+          type: integer
+          default: 0
+          description: Consulta campañas activas o inactivas.
+        - in: query
+          required: false
+          name: idDespacho
+          type: integer
+          description: Consulta las campañas asignadas a un despacho. El campo es obligatorio si idEstatus es igual a 0.
+
+      responses:
+        200:
+          description: Ok.
+          schema:
+            $ref: "#/definitions/respuestaCampania"
+        400:
+          description: Solicitud incorrecta
+          schema:
+            $ref: "#/definitions/error400"
+        404:
+          description: Recurso no encontrado
+          schema:
+            $ref: "#/definitions/error404"
+        500:
+          description: Error interno de servidor
+          schema:
+            $ref: "#/definitions/error"
+      security:
+        - Bearer: []
+  
+  /clientes:
+    get:
+      description: A través de este recurso se consultara los clientes asignados por campaña.
+      tags:
+       - Campañas Contac Center.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: x-id-acceso
+          in: header
+          description: |
+            `Identificador de acceso(idAcceso) obtenido del api de seguridad`
+          required: true
+          type: string
+          default: "24323"
+        - in: query
+          required: true
+          name: idDespacho
+          type: number
+          description: Identificador asignado al despacho
+        - in: query
+          required: true
+          name: idCampana
+          type: number
+          description: identificador de la campaña.
+        - in: query
+          required: true
+          name: numeroPagina
+          type: number
+          description: Numero de la pagina a cosultar.
+
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/ResponseCliente"
+        400:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error400"
+        404:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error404"
+        401:
+          description: Solicitud incorrecta.
+          schema:
+            $ref: "#/definitions/error401"
+        500:
+          description: Error interno en el servidor.
+          schema:
+            $ref: "#/definitions/error"
+
+  /campanias/pagos:
+    get:
+      description: Obtiene registros de los pagos .
+      tags:
+        - Campañas Contac Center.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: x-id-acceso
+          in: header
+          description: |
+            `Identificador de acceso (idAcceso) obtenido del api de seguridad.`
+          required: true
+          type: string
+          default: Q685828920200407191603
+        - name: idDespacho
+          in: query
+          required: true
+          type: string
+          default: 22
+          description: Despacho al que pertenece la informacion del los pagos
+        - name: idCampania
+          in: query
+          required: true
+          type: string
+          description: >-
+            Identificador de la campaña al que pertenece la informacion del los
+            pagos
+          default: '1889'
+        - name: fechaAbono
+          in: query
+          required: true
+          type: string
+          description: Fecha en la que se realizó el abono. 
+        - name: numeroPagina
+          in: query
+          required: true
+          type: string
+          description: >-
+            Numero de la pagina que se esta consultando
+          default: '1'
+      responses:
+        '200':
+          description: Ok.
+          schema:
+            $ref: '#/definitions/respuestaPagos'
+          examples:
+            $ref: '#/definitions/respuestaPagos'
+        '400':
+          description: Solicitud incorrecta
+          schema:
+            $ref: '#/definitions/error400'
+          examples:
+            $ref: '#/definitions/error400'
+        '401':
+          description: Solicitud no autorizada
+          schema:
+            $ref: '#/definitions/error401'
+          examples:
+            $ref: '#/definitions/error401'
+        '404':
+          description: Recurso no encontrado
+          schema:
+            $ref: '#/definitions/error404'
+          examples:
+            $ref: '#/definitions/error404'
+        '500':
+          description: Error interno de servidor
+          schema:
+            $ref: '#/definitions/error'
+          examples:
+            $ref: '#/definitions/error'
+      security:
+        - Bearer: []
+
+  /clientes/compromiso-pagos:
+    get:
+      description: Obtiene registros de los compromisos de pagos.
+      tags:
+        - Campañas Contac Center.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: x-id-acceso
+          in: header
+          description: |
+            `Identificador de acceso (idAcceso) obtenido del api de seguridad.`
+          required: true
+          type: string
+          default: Q685828920200407191603
+        - name: idDespacho
+          in: query
+          required: true
+          type: string
+          default: 22
+          description: Despacho al que pertenece la informacion del los pagos
+        - name: idCampania
+          in: query
+          required: true
+          type: string
+          description: >-
+            Identificador de la campaña al que pertenece la informacion del los
+            pagos
+          default: '1889'
+        - name: fechaGestion
+          in: query
+          required: false
+          type: string
+          default: 01-01-1991
+          description: Consulta de los compromisos que se generan en una fecha indicada.
+        - name: fechaCompromiso
+          in: query
+          required: false
+          type: string
+          default: 01-01-1991
+          description: Consulta de los compromisos que se deben cumplir en la fecha indicada.
+        - name: numeroPagina
+          in: query
+          required: true
+          type: string
+          description: >-
+            Numero de la pagina que se esta consultando
+          default: '1'
+      responses:
+        '200':
+          description: Ok.
+          schema:
+            $ref: '#/definitions/respuestaCompromisosPagos'
+        '400':
+          description: Solicitud incorrecta
+          schema:
+            $ref: '#/definitions/error400'
+        '401':
+          description: Solicitud no autorizada
+          schema:
+            $ref: '#/definitions/error401'
+        '404':
+          description: Recurso no encontrado
+          schema:
+            $ref: '#/definitions/error404'
+        '500':
+          description: Error interno de servidor
+          schema:
+            $ref: '#/definitions/error'
+      security:
+        - Bearer: []
+
+definitions:
+  respuestaCampania:
+    type: object
+    properties:
+      mensaje:
+        type: string
+        description: Descripción de la operación
+        example: "Operación exitosa."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      resultado:
+        $ref: '#/definitions/listaCampanias'
+
+  listaCampanias:
+   type: object
+   properties:
+     campanias:
+       type: array
+       items:
+          $ref: '#/definitions/campanias'
+
+  campanias:
+    type: object
+    properties:
+      idCampania:
+        type: integer
+        description: Identificador de campaña.
+        example: 740
+      nombre:
+        type: string
+        description: Nombre de campaña.
+        example: "Prueba de Correo 1"
+      nombreCorto:
+        type: string
+        description: Nombre corto de la campaña.
+        example: "Prueba de Correo 1"
+      fechaHoraModificacion:
+        type: string
+        format: date–full-date
+        description: Identificador del tipo de cartera.
+        example: "2020-08-26 16:26:50"
+      idUsuario:
+        type: string
+        description: |
+          Numero de empleado que modifico la campaña.
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+        example: "76585"
+      sumaTotalClientes:
+        type: integer
+        description: Total de clientes asignados a la campaña.
+        example: 14946
+      idTipoCampania:
+        type: integer
+        description: Identificador de tipo de campaña  1.-welcome, 2.- cobranza.
+        example: 1
+      semanaAtraso:
+        type: string
+        description: Semana de atraso de los clientes que se contemplan en la campaña.
+        example: "1"
+
+  ResponseCliente:
+    type: object
+    properties:
+      mensaje:
+        type: string
+        description: Mensaje de éxito.
+        example: "Operación exitosa."
+      folio:
+        type: string
+        description: Folio de la operación.
+        example: "2024022911161291709226972910"
+      resultado:
+        $ref: '#/definitions/listaClientes'
+
+
+  listaClientes:
+    type: object
+    properties:
+      clientes:
+       type: array
+       description: Array con todos los clientes asignados a la campaña.
+       items:
+         $ref: '#/definitions/Clientes'
+      paginacion:
+        allOf:
+        - $ref: '#/definitions/paginador'
+
+
+  Clientes:
+    type: object
+    properties:
+      idCampania:
+        type: number
+        description: identificador de la fila de trabajo
+        example: 1260
+      nombre:
+        type: string
+        description: |
+          Nombre del cliente
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+        example: LAURA
+      apellidoPaterno:
+        type: string
+        description: |
+          Apellido paterno del cliente
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+        example: VAZQUEZ
+      apellidoMaterno:
+        type: string
+        description: |
+          Apellido materno del cliente
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+        example: VAZQUEZ
+      contactos:
+        type: object
+        properties:
+          telefonos:
+            type: array
+            description: Lista de telefonos del cliente.
+            items:
+              $ref: '#/definitions/listaTelefonos'
+          correos:
+            type: array
+            description: |
+              Lista de correos que tiene registrados el cliente.
+              `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+            items:
+              type: string
+              example: Micorreo@correo.com
+      clienteUnico:
+         allOf:
+          - $ref: '#/definitions/clienteUnico'
+      semanasAtraso:
+        type: number
+        description: Semanas de atraso del cliente.
+        example: 2
+      saldo:
+        type: number
+        description: |
+          Saldo actual del crédito.
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+        example: 9789
+      pagoRequerido:
+        type: number
+        description: |
+          Pago para que el cliente se ponga al corriente.
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+        example: 226
+      diaPago:
+        type: number
+        description: Día de pago del cliente, Domingo = 1, Lunes = 2, Martes= 3, Miércoles = 4, Jueves = 5, Viernes= 6, Sábado= 7 
+        example: 3
+      diasAtraso:
+        type: number
+        description: días de atraso que tiene el cliente.
+        example: 1
+      pagoMinimo:
+        type: number
+        description: |
+          Pago para que el cliente no se atrase, solo aplica para clientes con tarjeta de crédito.
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+        example: 0
+      pagoNoGeneraIntereses:
+        type: number
+        description: |
+          Pago para que nos se generen intereses, solo aplica para clientes con tarjeta de crédito.
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+      abonoPuntual:
+        type: number
+        description: |
+          Monto del abono si el cliente lo realiza puntualmente
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+        example: 226
+      abonoSemanal:
+        type: number
+        description: |
+          Monto del abono semanal.
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+      fechaProximaPago:
+        type: string
+        description: Fecha del próximo pago del cliente.
+        example: "2022-06-30"
+      fechaVencimiento:
+        type: string
+        description: Fecha de fin de pago.
+        example: "2022-06-30"
+      producto:
+        type: string
+        description: Producto del cliente por el cual salió a campaña.
+        example: COMERCIO.
+      domicilio:
+        type: object
+        properties:
+          calle:
+            type: string
+            description: |
+              Calle del domicilio del cliente.
+              `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+          numeroInterior:
+            type: string
+            description: |
+              Numero interior del domicilio del cliente.
+              `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+          numeroExterior:
+            type: string
+            description: |
+              Numero exterior del domicilio del cliente
+              `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+          colonia:
+            type: string
+            description: |
+              Colionia del domicilio del cliente
+              `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+          codigoPostal:
+            type: string
+            description: |
+              Codigo postal del domicilio del cliente
+              `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+
+
+  listaTelefonos:
+    type: object
+    properties:
+      numero:
+        type: string
+        description: |
+          Numero de telefono del cliente.
+          `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+        example: 5566778899
+      tipo:
+        type: string
+        description: tipo de telefono, Movil o Fijo
+        enum:
+          - MOVIL
+          - FIJO
+      
+
+  clienteUnico:
+    type: object
+    properties:
+      idPais:
+        type: integer
+        description: >
+          Identificador del país.
+
+          `Descifre el valor de éste campo con la llave pública (accesoPublico)
+          obtenida del api de seguridad 
+
+          con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 1
+      idCanal:
+        type: integer
+        description: >-
+          Identificador del canal `Descifre el valor de éste campo con la llave
+          pública (accesoPublico) obtenida del api de seguridad con el cifrado
+          RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 1
+      idSucursal:
+        type: integer
+        description: >-
+          Identificador de la sucursal `Descifre el valor de éste campo con la
+          llave pública (accesoPublico) obtenida del api de seguridad con el
+          cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 6923
+      folio:
+        type: integer
+        description: >-
+          Identificador del folio `Descifre el valor de éste campo con la llave
+          pública (accesoPublico) obtenida del api de seguridad con el cifrado
+          RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 172834
+
+  pagos:
+    type: object
+    description: Lista de informacion de pagos
+    properties:
+      pagos:
+        type: array
+        description: Lista que contiene la informacion de los pagos de los clientes
+        items:
+          $ref: '#/definitions/pagosDto'
+      paginacion:
+        allOf:
+          - $ref: '#/definitions/paginador'
+  paginador:
+    type: object
+    properties:
+      pagina:
+        type: integer
+        description: pagina que se solicito en la consulta
+        example: 1
+      totalPaginas:
+        type: integer
+        description: total de paginas que tiene la informacion de pagos
+        example: 7
+      totalRegistrosPorPagina:
+        description: Total de los registros retornados por pagina
+        type: integer
+        example: 10
+      totalRegistros:
+        description: Total de los registros retornados por pagina
+        type: integer
+        example: 200
+
+
+  pagosDto:
+    type: object
+    properties:
+      idCampania:
+        type: integer
+        description: Identificador de la campaña
+        example: 1889
+      clienteUnico:
+        allOf:
+          - $ref: '#/definitions/clienteUnico'
+      montoRequerido:
+        type: integer
+        description: >-
+          Abono que el cliente tiene que hacer para ponerse al corriente
+          `Descifre el valor de éste campo con la llave pública (accesoPublico)
+          obtenida del api de seguridad con el cifrado
+          RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 49
+      abonoTotal:
+        type: integer
+        description: >-
+          Es la sumatoria de todos los pagos registrado por el cliente al dia
+          vencido. `Descifre el valor de éste campo con la llave pública
+          (accesoPublico) obtenida del api de seguridad con el cifrado
+          RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 1
+      canalOrigen :
+        type: integer
+        description: Medio de pago que el cliente utilizo para realizar el abono
+        example: SIN MEDIO DE PAGO DISPONIBLE
+  respuestaPagos:
+    type: object
+    properties:
+      mensaje:
+        type: string
+        description: Descripción de la operación
+        example: Operación exitosa.
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: 161-202010261020090300
+      resultado:
+        allOf:
+          - $ref: '#/definitions/pagos'
+
+  respuestaCompromisosPagos:
+    type: object
+    properties:
+      mensaje:
+        type: string
+        description: Descripción de la operación
+        example: Operación exitosa.
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: 161-202010261020090300
+      resultado:
+        $ref: '#/definitions/listaCompromisos'
+
+
+  listaCompromisos:
+    type: object
+    properties:
+      compromisos:
+        type: array
+        items:
+          $ref: '#/definitions/compromisos'
+
+      paginacion:
+           allOf:
+           - $ref: '#/definitions/paginador'
+
+
+  compromisos:
+   type: object
+   properties:
+     clienteUnico:
+       allOf:
+         - $ref: '#/definitions/clienteUnico'
+     fechaGestion:
+       type: string
+       description: Fecha en la que se realizó la gestión del cliente.
+       example: 02/03/2024
+     fechaCompromiso:
+       type: string
+       description: Fecha en la que el cliente se compromete a pagar.
+       example: 05/03/2024
+     montoComprometido:
+       type: integer
+       description: |
+         Monto al que el cliente se compromete pagar.
+         `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+       example: 309
+     montoAbono:
+       type: integer
+       description: |
+         Monto que el cliente pago.
+         `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+       example: 10 
+     fechaAbono:
+       type: string
+       description: Fecha en la que el cliente realizo el pago.
+       example: 04/03/2024
+     montoRequerido:
+       type: integer
+       description: |
+         Abono que el cliente tiene que hacer para ponerse al corriente
+         `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+       example: 903
+     numeroEmpleado:
+       type: string
+       description: |
+         Numero de empleado que realizo la gestion.
+         `Descifrar el valor de éste campo con la llave privada (accesoPrivado) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding encoding UTF-8.`
+       example: 999999
+     semanasAtrasoInicial:
+       type: integer
+       description: Atraso que tenía el cliente al momento de la gestión.
+       example: 1
+     semanasAtrasoFinal:
+       type: integer
+       description: Atraso que tiene el cliente después de la fecha de su compromiso de pago.
+       example: 2
+
+  error:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "500.Socios-Comerciales-Investigacion-Cobranza-Pagos-Credito-Campanias.160500"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "No se recibió respuesta del servidor."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#500.Socios-Comerciales-Investigacion-Cobranza-Pagos-Credito-Campanias.160500"
+      detalles:
+        type: array
+        items:
+          type: string
+          example: ""
+
+  error400:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "400.Socios-Comerciales-Investigacion-Cobranza-Pagos-Credito-Campanias.162400"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "Datos de entrada incorrectos, favor de validar."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#400.Socios-Comerciales-Investigacion-Cobranza-Pagos-Credito-Campanias.162400"
+      detalles:
+        type: array
+        items:
+          type: object
+          properties:
+            propiedad:
+              type: string
+              description: Nombre del parametro con valores incorrectos
+              example: "fechaInicial"
+            error:
+              type: array
+              items:
+                type: string
+                example: "El campo fechaInicial no tiene el formato dd-MM-yyyy"
+
+  error404:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "404.Socios-Comerciales-Investigacion-Cobranza-Pagos-Credito-Campanias.160404"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "Recurso no encontrado."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#404.Socios-Comerciales-Investigacion-Cobranza-Pagos-Credito-Campanias.160404"
+      detalles:
+        type: array
+        items:
+          type: string
+          example: "No se encuentran datos asociados a la consulta."
+  error401:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "401.Socios-Comerciales-Investigacion-Cobranza-Pagos-Credito-Campanias.160401"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "No autorizado."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#404.Socios-Comerciales-Investigacion-Cobranza-Pagos-Credito-Campanias.160401"
+      detalles:
+        type: array
+        items:
+          type: string
+          example: ""
+
+  summary:
+    type: object
+    properties:
+      api-name:
+        type: string
+        description: API de rutas para cobranza.
+        example: Rutas V1.
+
+      -campanias-get:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: Campañas de contac center
+            example: Campañas de contac center
+      clientes-get:
+        type: object
+        properties: 
+          displayName:
+            type: string
+            description: Consulta de clientes asignados a un id de campañas.
+            example: Consulta de clientes asignados a un id de campañas.
+      campanias-pagos-get:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: Obtiene registros de los pagos.
+            example: Obtiene registros de los pagos.
+      clientes-compromisos-pagos-get:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: TObtiene registros de los compromisos de pagos.
+            example: Obtiene registros de los compromisos de pagos.
+     
