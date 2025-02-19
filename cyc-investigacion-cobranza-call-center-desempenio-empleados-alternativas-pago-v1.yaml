@@ -1,0 +1,443 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Api Desempeño Empleados para cobranza call center
+
+  description: |
+    API para obtener la eficiencia y desempeño de empleados de Contact Center
+
+host: dev-api.bancoazteca.com.mx:8080
+
+basePath: /cobranza-credito/investigacion-cobranza/call-center/desempenio-empleados/alternativas-pago/v1
+
+schemes:
+  - https
+
+produces:
+  - application/json
+
+securityDefinitions:
+  Bearer:
+    description: >
+      Para acceder a la API se debe pasar un token válido en todas las consultas.
+      La siguiente sintaxis se debe utilizar en el encabezado 'Authorization' :
+        Bearer: 2zzLJmBAtTNIU8nF8e8XbmDvaNGs
+    type: apiKey
+    name: Authorization
+    in: header
+
+security:
+  - Bearer: [ ]
+
+paths:
+  /campanias/gestiones:
+    get:
+      description: Obtiene la informacion de los planes de pago gestionados por empelado.
+      tags:
+        - Campañas Contac Center.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: x-id-acceso
+          in: header
+          description: |
+            `Identificador de acceso (idAcceso) obtenido del api de seguridad.`
+          required: true
+          type: string
+          default: 8685823548
+        - name: idDespacho
+          in: query
+          required: true
+          type: string
+          description: >-
+            id identificador del despacho que realiza la consulta
+          default: "3"
+        - name: fecha
+          in: query
+          required: true
+          type: string
+          default: 15-09-2024
+          description: Fecha a la que pertenece la consulta.
+
+      responses:
+        '200':
+          description: Ok.
+          schema:
+            $ref: '#/definitions/respuestaPlanesPago'
+          examples:
+            application/json:
+              {
+                "mensaje": "Operación exitosa.",
+                "folio": "161-202010261020090300",
+                "resultado": {
+                  "empleados": [
+                    {
+                      "numeroEmpleado": "74630",
+                      "nombre": "CRISTIAN ULISSES",
+                      "apellidoPaterno": "MARTINEZ",
+                      "apellidoMaterno": "MUÑOZ ",
+                      "turno": "VESPERTINO",
+                      "puesto": "OPERADOR",
+                      "gestion":
+                        {
+                          "fechaHoraPrimera": "13/10/2024 11:11",
+                          "fechaHoraUltima": "13/10/2024 11:11",
+                          "totalHoras": "06:20",
+                          "totalGestionadas": 8,
+                          "alternativasPago": [
+                            {
+                              "id": 1,
+                              "nombre": "restructuras",
+                              "totalGestionadas": 1,
+                              "totalVigentes": 0,
+                              "totalAtrasadas": 1,
+                              "totalVencidas": 0,
+                              "totalcumplidas": 0,
+                              "totalActivas": 0,
+                              "totalCanceladas": 0,
+                              "totalIncumplidas": 0
+                            },
+                            {
+                              "id": 2,
+                              "nombre": "promesas",
+                              "totalGestionadas": 3,
+                              "totalVigentes": 0,
+                              "totalAtrasadas": 0,
+                              "totalVencidas": 0,
+                              "totalcumplidas": 2,
+                              "totalActivas": 0,
+                              "totalCanceladas": 0,
+                              "totalIncumplidas": 0
+                            },
+                            {
+                              "id": 3,
+                              "nombre": "liquidacion",
+                              "totalGestionadas": 3,
+                              "totalVigentes": 0,
+                              "totalAtrasadas": 0,
+                              "totalVencidas": 0,
+                              "totalcumplidas": 0,
+                              "totalActivas": 1,
+                              "totalCanceladas": 2,
+                              "totalIncumplidas": 0
+                            }
+                          ]
+                        }
+                    }
+                  ],
+                  "paginacion": {
+                    "pagina":1,
+                    "totalPaginas":2,
+                    "totalRegistros":60,
+                    "totalRegistrosPorPagina":20
+                  }
+                }
+              }
+
+
+
+        '400':
+          description: Solicitud incorrecta
+          schema:
+            $ref: '#/definitions/error400'
+        '401':
+          description: Solicitud no autorizada
+          schema:
+            $ref: '#/definitions/error401'
+        '404':
+          description: Recurso no encontrado
+          schema:
+            $ref: '#/definitions/error404'
+        '500':
+          description: Error interno de servidor
+          schema:
+            $ref: '#/definitions/error'
+      security:
+        - Bearer: [ ]
+
+definitions:
+
+  respuestaPlanesPago:
+    type: object
+    properties:
+      mensaje:
+        type: string
+        description: Descripción de la operación
+        example: Operación exitosa.
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: 161-202010261020090300
+      resultado:
+        type: object
+        properties:
+          empleados:
+            type: array
+            items:
+              type: object
+              properties:
+                numeroEmpleado:
+                  type: integer
+                  description: >-
+                    Numero de empleado del colaborador `Descifre el valor de éste campo con la llave
+                    privada (accesoPrivado) obtenida del api de seguridad con el cifrado
+                    RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+                  example: 12345
+                nombre:
+                  type: string
+                  description: >-
+                    Nombre del colaborador `Descifre el valor de éste campo con la llave
+                    privada (accesoPrivado) obtenida del api de seguridad con el cifrado
+                    RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+                  example: Luis David
+                apellidoPaterno:
+                  type: string
+                  description: >-
+                    Apellido paterno del colaborador `Descifre el valor de éste campo con la
+                    llave privada (accesoPrivado) obtenida del api de seguridad con el
+                    cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+                  example: Bartolome
+                apellidoMaterno:
+                  type: string
+                  description: >-
+                    Apellido materno del colaborador `Descifre el valor de éste campo con la llave
+                    privada (accesoPrivado) obtenida del api de seguridad con el cifrado
+                    RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+                  example: Cordova
+                turno:
+                  type: string
+                  description: >-
+                    Turno de trabajo del colaborador `Descifre el valor de éste campo con la llave
+                    privada (accesoPrivado) obtenida del api de seguridad con el cifrado
+                    RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+                  example: MATUTINO
+                puesto:
+                  type: string
+                  description: >-
+                    puesto de trabajo del colaborador `Descifre el valor de éste campo con la llave
+                    privada (accesoPrivado) obtenida del api de seguridad con el cifrado
+                    RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+                  example: OPERADOR
+                gestion:
+                  allOf:
+                    - $ref: '#/definitions/gestion'
+
+          paginacion:
+            allOf:
+              - $ref: '#/definitions/paginacion'
+
+  gestion:
+    type: object
+    properties:
+      fechaHoraPrimera:
+        type: string
+        description: Fecha de la primera gestion
+        example: 11/09/2024 08:07
+      fechaHoraUltima:
+        type: string
+        description: Fecha de la ultima gestion realizada
+        example: 11/09/2024 08:07
+      totalHoras:
+        type: string
+        description: Total de horas de gestion realizadas
+        example: 06:21
+      totalGestionadas:
+        type: integer
+        description: Total de gestiones realizadas
+        example: 99
+      alternativasPago:
+        description: lista de los tipos de alternativas de pago
+        type: array
+        items:
+          allOf:
+            - $ref: '#/definitions/alternativa'
+
+  alternativa:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: id de las alternativas atendidas
+        example: 1
+      nombre:
+        type: integer
+        description: Nombre de la alternativa de pago
+        example: "Liquidacion"
+      totalGestionadas:
+        type: integer
+        description: Total de las alternativas atendidas
+        example: 3
+      totalVigentes:
+        type: integer
+        description: Total de gestiones con estatus en vigente atendidas
+        example: 0
+      totalAtrasadas:
+        type: integer
+        description: Total de gestiones con estatus atrasado atendidas
+        example: 1
+      totalVencidas:
+        type: integer
+        description: Total de gestiones con estatus cancelado atendidas
+        example: 0
+      totalcumplidas:
+        type: integer
+        description: Total de gestiones con estatus cumplido atendidas
+        example: 0
+      totalActivas:
+        type: integer
+        description: Total de gestiones con estatus activa atendidas
+        example: 0
+      totalCanceladas:
+        type: integer
+        description: Total de gestiones con estatus cancelada atendidas
+        example: 0
+      totalIncumplidas:
+        type: integer
+        description: Total de gestiones con estatus incumplidas atendidas
+        example: 0
+
+  paginacion:
+    type: object
+    properties:
+      pagina:
+        type: integer
+        description: Numero de pagina.
+        example: 1
+      totalPaginas:
+        type: integer
+        description: Total de paginas de la campaña.
+        example: 1
+      totalRegistrosPorPagina:
+        type: integer
+        description: Numero de registros por pagina.
+        example: 10
+
+
+  error:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "500.Cobranza-Credito-Investigacion-Cobranza-Call-Center-Desempenio-Empleados-Alternativas-Pago.160500"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "No se recibió respuesta del servidor."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#500.Cobranza-Credito-Investigacion-Cobranza-Call-Center-Desempenio-Empleados-Alternativas-Pago.160500"
+      detalles:
+        type: array
+        items:
+          type: string
+          example: ""
+
+  error400:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "400.Cobranza-Credito-Investigacion-Cobranza-Call-Center-Desempenio-Empleados-Alternativas-Pago.162400"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "Datos de entrada incorrectos, favor de validar."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#400.Cobranza-Credito-Investigacion-Cobranza-Call-Center-Desempenio-Empleados-Alternativas-Pago.162400"
+      detalles:
+        type: array
+        items:
+          type: object
+          properties:
+            propiedad:
+              type: string
+              description: Nombre del parametro con valores incorrectos
+              example: "fecha"
+            error:
+              type: array
+              items:
+                type: string
+                example: "El campo fecha no tiene el formato dd-MM-yyyy"
+
+  error404:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "404.Cobranza-Credito-Investigacion-Cobranza-Call-Center-Desempenio-Empleados-Alternativas-Pago.160404"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "Recurso no encontrado."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#404.Cobranza-Credito-Investigacion-Cobranza-Call-Center-Desempenio-Empleados-Alternativas-Pago.160404"
+      detalles:
+        type: array
+        items:
+          type: string
+          example: "No se encuentran datos asociados a la consulta."
+
+  error401:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "401.Cobranza-Credito-Investigacion-Cobranza-Call-Center-Desempenio-Empleados-Alternativas-Pago.160401"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "No autorizado."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#404.Cobranza-Credito-Investigacion-Cobranza-Call-Center-Desempenio-Empleados-Alternativas-Pago.160401"
+      detalles:
+        type: array
+        items:
+          type: string
+          example: ""
+
+  summary:
+
+
+    type: object
+    properties:
+      api-name:
+        type: string
+        description: API para obtener la eficiencia y desempeño de empleados de Contact Center.
+        example: V1/campanias/gestiones.
+
+      gestiones-get:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: Consulta de gestion de alternativas de pago por despacho, fecha y territorio.
+            example: Consulta de gestion de alternativas de pago por despacho, fecha y territorio.

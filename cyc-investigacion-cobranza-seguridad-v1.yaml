@@ -1,0 +1,320 @@
+---
+swagger: '2.0'
+
+info:
+  version: 1.0.0
+  title: API SEGURIDAD Investigacion Cobranza
+  description: |
+    API de seguridad de datos sensibles
+host: dev-api.bancoazteca.com.mx:8080
+
+basePath: /cobranza-credito/investigacion-cobranza/seguridad/v1
+
+schemes:
+  - https
+securityDefinitions:
+  Bearer:
+    description: >
+      Para acceder a la API se debe pasar un token válido en todas las
+      consultas. La siguiente sintaxis se debe utilizar en el encabezado
+      'Authorization' :
+        Bearer: 2zzLJmBAtTNIU8nF8e8XbmDvaNGs
+    name: Authorization
+    type: apiKey
+    in: header
+security:
+  - Bearer: []
+paths:
+  "/aplicaciones/llaves":
+    get:
+      description: Genera token y llaves asimétricas para el cifrado y descifrado de datos sensibles
+      tags:
+        - Llaves asimétricas
+
+      produces:
+        - application/json
+
+      responses:
+        200:
+          description: Ok
+          schema:
+            $ref: '#/definitions/respuestaLlaves'
+          examples:
+            application/json: |-
+                {
+                    "folio": "2021082612590961630000749666",
+                    "mensaje": "Operación exitosa.",
+                    "resultado": {
+                        "idAcceso": "1071",
+                        "accesoPublico": "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALXoA1Qm5kaNCS6d8E/C+4UJZ98J791sqvVtd0Ff2j++wxwoH8n4l8MOfsfuRAQLsGOaRKe+4nd1V0eV28v7EzMCAwEAAQ==",
+                        "accesoPrivado": "MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEApACilkI18Jeo1sqBKJBHaN+LpMa2stsH2MdhoqfNLSC7nasKmXy91ln23E+Vn0fobFY9IzOtMsSXfEgBhhxyMQIDAQABAkEAkSi6v9JU2eHyoELXNScW/Z03hZ4Y4Y/6jwZSxdxOP4zZgKtH6T7S8VfL+Un8FMuhvKuw69bpK5BExfMJvSJcbQIhANMXZYYjmjvMqZ65hIFhD+j8OVypzsV/SDGykhcJTnrbAiEAxuSma9YqaHCw6qa//KaVtOWJ+FR2+RHSZJYo/12rJuMCIEYdF1Oer7P9Hrnh1OlEXAx++m6U2GExDcG0FmIgbTjRAiA6mv9KwTWHxsTqr63clX2Bay2HZeQUqiKzjuePr5sR/wIhALFBDWjLBny4zC83OAV3Vn88WBL33Rv7pn+fUcCP2zpJ",
+                        "fechaHoraExpiracion": "23/08/2021 13:18:29",
+                        "accesoSimetrico": "8ihMsm01Se2j7krLAM566HIlXp/TCb9cDWd/pVHZTuM=",
+                        "codigoAutentificacionHash": "VBkNvRMNRv9vwNz14DkUDKJ6+/tmte5yeZu8eOjZEjw="
+                    }
+                }
+
+        500:
+          description: Error interno de servidor
+          schema:
+           $ref: '#/definitions/error500'
+          examples:
+            application/json: |-
+              {
+                "codigo": "500.CobranzaCredito-Investigacion-Cobranza-Seguridad.143500",
+                "mensaje": "Error interno en el servicio.",
+                "folio": "2021082612590961630000749666",
+                "info": "https://baz-developer.bancoazteca.com.mx/info#500.CobranzaCredito-Investigacion-Cobranza-Seguridad.143500",
+                "detalles": [
+                  ""
+                ]
+              }
+
+  "/aplicaciones/llaves/{id}":
+    get:
+      description: Se recuperan llaves asimétricas para el cifrado y descifrado de datos sensibles por medio del idAcceso
+      tags:
+        - Llaves asimétricas
+
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Identificador de acceso
+          default:
+      responses:
+        200:
+          description: Ok
+          schema:
+            $ref: '#/definitions/respuestaLlavesid'
+          examples:
+            application/json: |-
+                {
+                    "folio": "2021082612590961630000749666",
+                    "mensaje": "Operación exitosa.",
+                    "resultado": {
+                        "idAcceso": "1071",
+                        "accesoPublico": "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALXoA1Qm5kaNCS6d8E/C+4UJZ98J791sqvVtd0Ff2j++wxwoH8n4l8MOfsfuRAQLsGOaRKe+4nd1V0eV28v7EzMCAwEAAQ==",
+                        "accesoPrivado": "MIIBVQIBADANBgkqhkiG9w0BAQEFAASCAT8wggE7AgEAAkEApACilkI18Jeo1sqBKJBHaN+LpMa2stsH2MdhoqfNLSC7nasKmXy91ln23E+Vn0fobFY9IzOtMsSXfEgBhhxyMQIDAQABAkEAkSi6v9JU2eHyoELXNScW/Z03hZ4Y4Y/6jwZSxdxOP4zZgKtH6T7S8VfL+Un8FMuhvKuw69bpK5BExfMJvSJcbQIhANMXZYYjmjvMqZ65hIFhD+j8OVypzsV/SDGykhcJTnrbAiEAxuSma9YqaHCw6qa//KaVtOWJ+FR2+RHSZJYo/12rJuMCIEYdF1Oer7P9Hrnh1OlEXAx++m6U2GExDcG0FmIgbTjRAiA6mv9KwTWHxsTqr63clX2Bay2HZeQUqiKzjuePr5sR/wIhALFBDWjLBny4zC83OAV3Vn88WBL33Rv7pn+fUcCP2zpJ",
+                        "fechaHoraExpiracion": "23/08/2021 13:18:29",
+                        "accesoSimetrico": "8ihMsm01Se2j7krLAM566HIlXp/TCb9cDWd/pVHZTuM=",
+                        "codigoAutentificacionHash": "VBkNvRMNRv9vwNz14DkUDKJ6+/tmte5yeZu8eOjZEjw="
+                    }
+                }
+        400:
+          description: Solicitud incorrecta
+          schema:
+           $ref: '#/definitions/error400'
+          examples:
+            application/json: |-
+              {
+                "codigo": "400.CobranzaCredito-Investigacion-Cobranza-Seguridad.143400",
+                "mensaje": "Solicitud Incorrecta.",
+                "folio": "2021082612590961630000749666",
+                "info": "https://baz-developer.bancoazteca.com.mx/info#400.CobranzaCredito-Investigacion-Cobranza-Seguridad.143400",
+                "detalles": [
+                  ""
+                ]
+              }
+        404:
+          description: Recurso no encontrado
+          schema:
+           $ref: '#/definitions/error404'
+          examples:
+            application/json: |-
+              {
+                "codigo": "404.CobranzaCredito-Investigacion-Cobranza-Seguridad.143404",
+                "mensaje": "No encontrado.",
+                "folio": "2021082612590961630000749666",
+                "info": "https://baz-developer.bancoazteca.com.mx/info#404.CobranzaCredito-Investigacion-Cobranza-Seguridad.143404",
+                "detalles": [
+                  ""
+                ]
+              }
+        500:
+          description: Error interno de servidor
+          schema:
+           $ref: '#/definitions/error500'
+          examples:
+            application/json: |-
+              {
+                "codigo": "500.CobranzaCredito-Investigacion-Cobranza-Seguridad.143500",
+                "mensaje": "Error interno en el servicio.",
+                "folio": "2021082612590961630000749666",
+                "info": "https://baz-developer.bancoazteca.com.mx/info#500.CobranzaCredito-Investigacion-Cobranza-Seguridad.143500",
+                "detalles": [
+                  ""
+                ]
+              }
+
+definitions:
+  respuestaLlaves:
+    type: object
+    properties:
+      mensaje:
+        type: string
+        description: Descripción de la operación
+        example: 'Operación Exitosa.'
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: 'awsapigeermczdev03-8006-8010-1'
+      resultado:
+        type: object
+        properties:
+          id:
+            type: string
+            description: Identificador de acceso generado
+            example: '5d081438b447'
+          accesoPublico:
+            type: string
+            description: Llave pública para cifrar
+            example: 'BAQEFAAOCAQ8AMIIBC'
+          accesoPrivado:
+            type: string
+            description: Llave Privada para descifrar
+            example: 'iG9w0BAQEFAASCBKcwggSj'
+          fechaHoraExpiracion:
+            type: string
+            description: Fecha de expiracion de las llaves
+            example: '2020-08-03 10:39:50'
+          accesoSimetrico:
+            type: string
+            description: Llave simétrica para cifrar documentos
+            example: '8ihMsm01Se2j7krLAM566HIlXp/TCb9cDWd/pVHZTuM='
+          codigoAutentificacionHash:
+            type: string
+            description: Llave para cifrado de documentos
+            example: 'VBkNvRMNRv9vwNz14DkUDKJ6+/tmte5yeZu8eOjZEjw='
+
+  respuestaLlavesid:
+    type: object
+    properties:
+      mensaje:
+        type: string
+        description: Descripción de la operación
+        example: 'Operación Exitosa.'
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: 'awsapigeermczdev03-8006-8010-1'
+      resultado:
+        type: object
+        properties:
+          id:
+            type: string
+            description: Identificador de acceso generado
+            example: '5d081438b447'
+          accesoPublico:
+            type: string
+            description: Llave pública para cifrar
+            example: 'BAQEFAAOCAQ8AMIIBC'
+          accesoPrivado:
+            type: string
+            description: Llave Privada para descifrar
+            example: 'iG9w0BAQEFAASCBKcwggSj'
+          fechaHoraExpiracion:
+            type: string
+            description: Fecha de expiracion de las llaves
+            example: '2020-08-03 10:39:50'
+          accesoSimetrico:
+            type: string
+            description: Llave simétrica para cifrar documentos
+            example: '8ihMsm01Se2j7krLAM566HIlXp/TCb9cDWd/pVHZTuM='
+          codigoAutentificacionHash:
+            type: string
+            description: Llave para cifrado de documentos
+            example: 'VBkNvRMNRv9vwNz14DkUDKJ6+/tmte5yeZu8eOjZEjw='
+  error400:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: '400.CobranzaCredito-Investigacion-Cobranza-Seguridad.143400'
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "Solicitud Incorrecta."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2021082612590961630000749666"
+      info:
+        type: string
+        description: Ruta para encontrar más detalles sobre esta respuesta
+        example: 'https://baz-developer.bancoazteca.com.mx/info#400.CobranzaCredito-Investigacion-Cobranza-Seguridad.143400'
+      detalles:
+        type: array
+        items:
+          type: string
+          description: Detalles del error
+          example: ''
+  error404:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: '404.CobranzaCredito-Investigacion-Cobranza-Seguridad.143404'
+      mensaje:
+        type: string
+        description: Descripción del error
+        example:  "No encontrado."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2021082612590961630000749666"
+      info:
+        type: string
+        description: Ruta para encontrar más detalles sobre esta respuesta
+        example: 'https://baz-developer.bancoazteca.com.mx/info#404.CobranzaCredito-Investigacion-Cobranza-Seguridad.143404'
+      detalles:
+        type: array
+        items:
+          type: string
+          description: Detalles del error
+          example: ''
+  error500:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: '500.CobranzaCredito-Investigacion-Cobranza-Seguridad.143500'
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "Error interno en el servicio."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2021082612590961630000749666"
+      info:
+        type: string
+        description: Ruta para encontrar más detalles sobre esta respuesta
+        example: 'https://baz-developer.bancoazteca.com.mx/info#500.CobranzaCredito-Investigacion-Cobranza-Seguridad.143500'
+      detalles:
+        type: array
+        items:
+          type: string
+          description: Detalles del error
+          example: ''
+
+  summary:
+    type: object
+    properties:
+      api-name:
+        type: string
+        description: API de seguridad de datos sensibles
+        example: 'API de seguridad de datos sensibles'
+      aplicaciones-llaves-get:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: Genera token y llaves asimétricas para el cifrado y descifrado de datos sensibles
+            example: 'Llaves asimétricas'

@@ -1,0 +1,230 @@
+swagger: '2.0'
+info:
+  version: "0.0.1"
+  title: API Autorizador de recursos.
+  description: |
+    Implementación de [OAuth 2.0](https://tools.ietf.org/html/rfc6749  "Docs") con Grant type Client Credentials
+
+host: 
+  dev-api.bancoazteca.com.mx:8080
+basePath: 
+  /oauth2/v1
+
+schemes:
+  - https
+
+produces:
+  - application/json
+  
+securityDefinitions:
+  Basic:
+    type: basic
+  Bearer:
+    description: >
+      Para acceder a la API se debe pasar un token válido en todas las consultas.
+      La siguiente sintaxis se debe utilizar en el encabezado 'Authorization' :
+        Bearer: 2zzLJmBAtTNIU8nF8e8XbmDvaNGs
+    type: apiKey
+    name: Authorization
+    in: header
+    
+paths:
+  /token:
+    post:
+      summary: Generación de token de acceso tipo de concesión client credentials.
+      description: |
+        La aplicación realiza una solicitud al endpoint del token agregando los siguientes parámetros que se describen a continuación
+      tags:
+        - Oauth2
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      parameters:
+        - name: grant_type
+          in: formData
+          description: El valor debe ser enviado como "client_credentials"
+          required: true
+          type: string
+          default: client_credentials
+          enum: 
+            - client_credentials
+
+      responses:
+        200:
+          description: Ok
+          schema:
+              $ref: '#/definitions/Token'
+         
+
+        400: 
+          description: Entrada incorrecta
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |-
+              {
+                  "codigo": "API.AS-5200",
+                  "mensaje": "El grant_type enviado no es el correcto, favor de validar",
+                  "folio": "awsapigeermczdev01-4266-653-1",
+                  "info": "https://baz-developer.bancoazteca.com.mx/errors#API.AS-5200",
+                  "detalles": [
+                      ""
+                  ]
+              }
+            
+        401: 
+          description: No autorizado
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |-
+              {
+                  "codigo": "API.AS-5300",
+                  "mensaje": "No estas autorizado, favor de validar",
+                  "folio": "awsapigeermczdev01-4266-653-2",
+                  "info": "https://baz-developer.bancoazteca.com.mx/errors#API.AS-5300",
+                  "detalles": [
+                      ""
+                  ]
+              }
+
+        404: 
+          description: No encontrado
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |-
+              {
+                  "codigo": "API.AS-5400",
+                  "mensaje": "Petición no válida, favor de validar su información",
+                  "folio": "awsapigeermczdev03-4023-576-1",
+                  "info": "https://baz-developer.bancoazteca.com.mx/errors#API.AS-5400",
+                  "detalles": [
+                      "El recurso solicitado no está disponible"
+                  ]
+              }
+              
+        500: 
+          description: Error inesperado
+          schema:
+            $ref: '#/definitions/Error'
+          examples:
+            application/json: |-
+              {
+                  "codigo": "API.AS-5500",
+                  "mensaje": "Error inesperado, favor de validar",
+                  "folio": "awsapigeermczdev02-4328-1056-1",
+                  "info": "https://baz-developer.bancoazteca.com.mx/errors#API.AS-5500",
+                  "detalles": [
+                      ""
+                  ]
+              }
+
+      security:
+        - Basic: []
+
+
+definitions:
+  Token:
+    type: object
+    properties:
+      refresh_token_expires_in:
+        type: string
+        description: La vida útil del token de actualización, en segundos.
+        example: "0"
+      api_product_list:
+        type: string
+        description: Una lista de los productos asociados con la aplicación de desarrollador correspondiente del token.
+        example: "[producto]"
+      api_product_list_json:
+        type: array
+        description: Una lista de los productos asociados con la aplicación de desarrollador correspondiente del token en formato json.
+        items:
+          type: string
+          example: [ "producto" ]
+      organization_name:
+        type: string
+        description: La organización donde se ejecuta el proxy.
+        example: "baz-desarrollo"
+      developer.email:
+        type: string
+        description: La dirección de correo electrónico del desarrollador registrado que posee la aplicación de desarrollador asociada con el token.
+        example: "dev@test.com"
+      token_type:
+        type: string
+        enum: 
+          - BearerToken
+        description: Tipo de token "Bearer"
+        example: "BearerToken"
+      issued_at:
+        type: string
+        description: La fecha en que se emitió el token de acceso.
+        example: "1568220303823"
+      client_id:
+        type: string
+        description: El ID de cliente de la aplicación registrada.
+        example: "IJq0yQVtRWcyZT6ZMMLPjevZMAunfLFG"
+      access_token:
+        type: string
+        description: El token de acceso que se está verificando.
+        example: "oP3P1oYnaFrTvQTHMOnjjZS3RLG"
+      application_name:
+        type: string
+        description: Identificador de la aplicación
+        example: "205dc3fc-e02a-4094-beeb-abd658b4d060"
+      scope:
+        type: string
+        description: El scope (si existe) asociado con el token de acceso.
+        example: ""
+      expires_in:
+        type: string
+        description: El tiempo de caducidad del token de acceso. Expresado en segundos.
+        example: "3599"
+      refresh_count:
+        type: string
+        description: Valor establecido para el número de refresh tokens 
+        example: "0"
+      status:
+        type: string
+        description: Ya sea aprobado o revocado.
+        example: "approved"
+   
+  Error:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "AS-5200"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "El GrantType enviado no es el correcto, favor de validar"
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "ip-10-96-10-176.ec2.internal-3264-1947855-1"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/errors#AS-5200"
+    
+      
+      
+        
+  summary:
+    type: object
+    properties: 
+      api-name:
+        type: string
+        description: Específica el nombre del API que se depliega en el portal
+        example: Oauth2 v1
+      token-post:
+        type: object
+        properties:
+          displayName: 
+            type: string
+            description: Solicitud de token de acceso.
+            example: Solicitud de token de acceso.
+     
