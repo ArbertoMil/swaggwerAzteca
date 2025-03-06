@@ -1,0 +1,280 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Api gestiones cobranza call center
+
+  description: |
+    API guardar la gestión de cobranza de un cliente por medio de un call center.
+
+host: sandbox.bancoazteca.com
+
+basePath: /socios-comerciales/investigacion-cobranza/call-center/gestiones-cobranza/bitacoras/v1
+
+schemes:
+  - https
+
+produces:
+  - application/json
+
+securityDefinitions:
+  Bearer:
+    description: >
+      Para acceder a la API se debe pasar un token válido en todas las consultas.
+      La siguiente sintaxis se debe utilizar en el encabezado 'Authorization' :
+        Bearer: 2zzLJmBAtTNIU8nF8e8XbmDvaNGs
+    type: apiKey
+    name: Authorization
+    in: header
+
+security:
+  - Bearer: []
+
+paths:
+  /gestiones:
+    post:
+      description: Se registra la tipificación de la gestión de cobranza de un cliente por medio de un call center.
+      tags:
+        - Campañas Contac Center.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: x-id-acceso
+          in: header
+          description: |
+            `Identificador de acceso (idAcceso) obtenido del api de seguridad.`
+          required: true
+          type: string
+          default: Q685828920200407191603
+        - in: body
+          name: Parámetros de entrada.
+          description: Datos de la gestion.
+          schema:
+            $ref: "#/definitions/entradaGestion"
+      responses:
+        201:
+          description: Ok.
+          schema:
+            $ref: "#/definitions/respuestaOk"
+        400:
+          description: Solicitud incorrecta
+          schema:
+            $ref: "#/definitions/error400"
+        401:
+          description: Acceso Denegado.
+          schema:
+            $ref: "#/definitions/error401"
+        500:
+          description: Error interno de servidor
+          schema:
+            $ref: "#/definitions/error"
+      security:
+        - Bearer: []
+  
+definitions:
+  clienteUnicoEntrada:
+    type: object
+    required:
+      - idPais
+      - idCanal
+      - idSucursal
+      - folio
+    properties:
+      idPais:
+        type: string
+        description: |
+          Identificador del país.
+          `Cifre el valor de éste campo con la llave pública (accesoPublico) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 1
+      idCanal:
+        type: string
+        description: |
+          Identificador del canal.
+          `Cifre el valor de éste campo con la llave pública (accesoPublico) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 1
+      idSucursal:
+        type: string
+        description: |
+          Identificador de la sucursal.
+          `Cifre el valor de éste campo con la llave pública (accesoPublico) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 2138
+      folio:
+        type: string
+        description: |
+          Identificador del folio del cliente.
+          `Cifre el valor de éste campo con la llave pública (accesoPublico) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 98862
+  
+  entradaGestion:
+    type: object
+    required:
+      - clienteUnico
+      - idGestion
+      - idAccion
+      - numeroEmpleado
+      - idCampania
+      - numeroTelefono
+      - idDespacho
+    properties: 
+      clienteUnico:
+        $ref: "#/definitions/clienteUnicoEntrada"
+      idGestion:
+        type: number
+        description: Identificador de gestión, revisar el catálogo de gestiones activas .
+        example: 233
+      idAccion:
+        type: number
+        description: Identificador de acción gestión, revisar el catálogo de gestiones activas .
+        example: 3
+      comentarios: 
+        type: string
+        description: Observaciones o comentarios sobre la gestión.
+        example: Prueba
+      numeroEmpleado:
+        type: string
+        description: |
+         Identificador del empleado, debe ser numérico y máximo de 10 dígitos.
+         `Cifre el valor de éste campo con la llave pública (accesoPublico) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+      idCampania:
+        type: number
+        description: Identificador de campaña.
+        example: 234
+      numeroTelefono:
+        type: string
+        description: |
+         Teléfono del cliente a 10 dígitos.
+         `Cifre el valor de éste campo con la llave pública (accesoPublico) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+        example: 5588203052
+      idDespacho:
+        type: number
+        description: Identificador del despacho.
+        example: 1
+      compromisoPago:
+        type: object
+        description: Solo es requerido cuando el idGestion es de compromiso de pago.
+        required:
+          - monto
+          - fechaHora
+        properties: 
+          monto:
+            type: number
+            description: |
+             Monto del compromiso de pago.
+             `Cifre el valor de éste campo con la llave pública (accesoPublico) obtenida del api de seguridad con el cifrado RSA/ECB/OAEPWithSHA-256AndMGF1Padding  encoding UTF-8.`
+            example: 10
+          fechaHora:
+            type: string
+            description: Fecha del compromiso
+            example: 10/08/2024 15:00:00 
+  
+  respuestaOk:
+    type: object
+    properties:
+      mensaje:
+        type: string
+        description: Mensaje de éxito.
+        example: "Operación exitosa."
+      folio:
+        type: string
+        description: Folio de la operación.
+        example: "202000021116513300"
+
+  error:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "500.Socios-Comerciales-Investigacion-Cobranza-Call-Center-Gestiones-Cobranza-Bitacoras.160500"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "No se recibió respuesta del servidor."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#500.Socios-Comerciales-Investigacion-Cobranza-Call-Center-Gestiones-Cobranza-Bitacoras.160500"
+      detalles:
+        type: array
+        items:
+          type: string
+          example: ""
+
+  error400:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "400.Socios-Comerciales-Investigacion-Cobranza-Call-Center-Gestiones-Cobranza-Bitacoras.162400"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "Datos de entrada incorrectos, favor de validar."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#400.Socios-Comerciales-Investigacion-Cobranza-Call-Center-Gestiones-Cobranza-Bitacoras.162400"
+      detalles:
+        type: array
+        items:
+          type: object
+          properties:
+            propiedad:
+              type: string
+              description: Nombre del parametro con valores incorrectos
+              example: "fechaInicial"
+            error:
+              type: array
+              items:
+                type: string
+                example: "El campo fechaInicial no tiene el formato dd-MM-yyyy"
+
+  error401:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código del error
+        example: "401.Socios-Comerciales-Investigacion-Cobranza-Call-Center-Gestiones-Cobranza-Bitacoras.160401"
+      mensaje:
+        type: string
+        description: Descripción del error
+        example: "No autorizado."
+      folio:
+        type: string
+        description: Número de folio de la operación
+        example: "2024022911161291709226972910"
+      info:
+        type: string
+        description: Rutas de ayuda para atender el error
+        example: "https://baz-developer.bancoazteca.com.mx/info#404.Socios-Comerciales-Investigacion-Cobranza-Call-Center-Gestiones-Cobranza-Bitacoras.160401"
+      detalles:
+        type: array
+        items:
+          type: string
+          example: ""
+
+  summary:
+    type: object
+    properties:
+      api-name:
+        type: string
+        description: API de campanias.
+      gestiones-post:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: A través de este recurso se registra la tipificación de la gestión de cobranza de un cliente por medio de un call center.
+     
+     
